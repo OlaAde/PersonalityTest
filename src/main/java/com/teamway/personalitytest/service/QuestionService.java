@@ -5,6 +5,7 @@ import com.teamway.personalitytest.entity.Question;
 import com.teamway.personalitytest.exception.ResourceNotFoundException;
 import com.teamway.personalitytest.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +16,10 @@ import java.util.stream.Collectors;
 public class QuestionService {
     private final QuestionRepository questionRepository;
 
+    public QuestionDto createQuestion(QuestionDto payload) {
+        Question question = new ModelMapper().map(payload, Question.class);
+        return QuestionDto.buildFrom(questionRepository.save(question));
+    }
 
     public List<QuestionDto> getQuestions() {
         return ((List<Question>) questionRepository.findAll()).stream().map(QuestionDto::buildFrom)
