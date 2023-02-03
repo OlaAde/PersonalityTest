@@ -1,5 +1,5 @@
 import React from 'react';
-import {QuestionType} from "../types/question";
+import {AnswerType, QuestionType} from "../types/question";
 import Answer from "./answer";
 
 type QuestionProps = React.ComponentPropsWithoutRef<"div"> & {
@@ -8,16 +8,30 @@ type QuestionProps = React.ComponentPropsWithoutRef<"div"> & {
     question: QuestionType,
     onPrevious: () => void,
     onNext: () => void,
-    isFirst: boolean
+    onSelectAnswer: (answer: AnswerType) => void,
+    selectedAnswer: AnswerType,
+    isFirst: boolean,
     isLast: boolean
 }
 
-const Question = ({question, onPrevious, onNext, isFirst, isLast, ...props}: QuestionProps) => {
+const Question = ({
+                      question,
+                      onPrevious,
+                      onNext,
+                      isFirst,
+                      isLast,
+                      onSelectAnswer,
+                      selectedAnswer,
+                      ...props
+                  }: QuestionProps) => {
+
     return (
         <div className="bg-white p-12 rounded-lg shadow-lg w-full mt-8" {...props}>
             <div>
                 <p className="text-2xl font-bold">{question.question}</p>
-                {question.answers.map(answer => <Answer answer={answer} key={answer.id}/>)}
+                {question.answers.map(answer => <Answer answer={answer} key={answer.id}
+                                                        onSelectAnswer={() => onSelectAnswer(answer)}
+                                                        isSelectedAnswer={selectedAnswer?.answer === answer.answer}/>)}
                 <div className="mt-6 flow-root">
                     <div className={"float-right"}>
                         <button
@@ -29,6 +43,7 @@ const Question = ({question, onPrevious, onNext, isFirst, isLast, ...props}: Que
 
                         <button
                             onClick={onNext}
+                            disabled={!selectedAnswer}
                             className="bg-indigo-600 disabled:bg-indigo-400 text-white text-sm font-bold tracking-wide rounded-full px-5 py-2 w-32">
                             {isLast ? 'Finish' : 'Next'}
                         </button>

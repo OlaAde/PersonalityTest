@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import Question from "../components/question";
-import {QuestionType} from "../types/question";
+import {AnswerType, QuestionType} from "../types/question";
 import Footer from "../components/footer";
 
 const Quiz = () => {
     const [questions, setQuestions] = useState<QuestionType[]>([]);
     const [current, setCurrent] = useState(0);
+    const [selections, setSelections] = useState<{ [id: number]: AnswerType }>({});
 
 
     useEffect(() => {
@@ -32,6 +33,10 @@ const Quiz = () => {
         setCurrent(current => current - 1);
     }
 
+    function onSelectAnswer(answer: AnswerType) {
+        setSelections(selections => ({...selections, [current]: answer}));
+    }
+
     function onFinish() {
 
     }
@@ -48,6 +53,8 @@ const Quiz = () => {
                                   onNext={onNext} onPrevious={onPrevious}
                                   isFirst={current === 0}
                                   isLast={questions.length - 1 === current}
+                                  onSelectAnswer={onSelectAnswer}
+                                  selectedAnswer={selections[current]}
                         />}
                 </div>
             </div>
