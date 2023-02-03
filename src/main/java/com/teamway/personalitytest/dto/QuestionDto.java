@@ -6,20 +6,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class QuestionDto {
     private String question;
-    private String answer1;
-    private String answer2;
-    private String answer3;
-    private String answer4;
-    private Integer answer1weight;
-    private Integer answer2weight;
-    private Integer answer3weight;
-    private Integer answer4weight;
-
+    private List<AnswerDto> answers;
     public static QuestionDto buildFrom(Question question) {
         return new ModelMapper().map(question, QuestionDto.class);
     }

@@ -36,7 +36,7 @@ public class QuestionController {
         }
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     private ResponseEntity<QuestionDto> updateQuestion(@PathVariable Long id, @RequestBody QuestionDto payload) {
         try {
             return ResponseEntity.ok(questionService.updateQuestion(id, payload));
@@ -47,7 +47,11 @@ public class QuestionController {
 
     @DeleteMapping("/{id}")
     private ResponseEntity<Object> deleteQuestion(@PathVariable Long id) {
-        questionService.deleteQuestion(id);
-        return ResponseEntity.status(204).build();
+        try {
+            questionService.deleteQuestion(id);
+            return ResponseEntity.status(204).build();
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

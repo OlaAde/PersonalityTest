@@ -1,6 +1,9 @@
 package com.teamway.personalitytest.service;
 
+import com.teamway.personalitytest.dto.AnswerDto;
 import com.teamway.personalitytest.dto.QuestionDto;
+import com.teamway.personalitytest.entity.Answer;
+import com.teamway.personalitytest.repository.AnswerRepository;
 import com.teamway.personalitytest.entity.Question;
 import com.teamway.personalitytest.exception.ResourceNotFoundException;
 import com.teamway.personalitytest.repository.QuestionRepository;
@@ -15,9 +18,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class QuestionService {
     private final QuestionRepository questionRepository;
+    private final AnswerRepository answerRepository;
 
     public QuestionDto createQuestion(QuestionDto payload) {
         Question question = new ModelMapper().map(payload, Question.class);
+        List<Answer> answers = saveNewAnswersToDb(payload.getAnswers());
+        question.setAnswers(answers);
         return QuestionDto.buildFrom(questionRepository.save(question));
     }
 
@@ -30,49 +36,32 @@ public class QuestionService {
         return questionRepository.findById(id).map(QuestionDto::buildFrom).orElseThrow(ResourceNotFoundException::new);
     }
 
-    public void deleteQuestion(Long id) {
+    public void deleteQuestion(Long id) throws ResourceNotFoundException {
+        Question entity = questionRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        deleteOldAnsersFromDb(entity);
         questionRepository.deleteById(id);
     }
 
     public QuestionDto updateQuestion(Long id, QuestionDto payload) throws ResourceNotFoundException {
         Question entity = questionRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
-        updateEntityFieldsBasedOnPayload(entity, payload);
 
+        deleteOldAnsersFromDb(entity);
+
+        List<Answer> answers = saveNewAnswersToDb(payload.getAnswers());
+        entity.setAnswers(answers);
         entity = questionRepository.save(entity);
 
         return QuestionDto.buildFrom(entity);
     }
 
-    private void updateEntityFieldsBasedOnPayload(Question entity, QuestionDto payload) {
-        if (payload.getQuestion() != null && !payload.getQuestion().isEmpty()) {
-            entity.setQuestion(payload.getQuestion());
-        }
+    private List<Answer> saveNewAnswersToDb(List<AnswerDto> answersDto) {
+        List<Answer> answers = answersDto.stream().map(a -> new Answer(a.getAnswer(), a.getAnswerWeight())).collect(Collectors.toList());
+        return (List<Answer>) answerRepository.saveAll(answers);
+    }
 
-        if (payload.getAnswer1() != null && !payload.getAnswer1().isEmpty()) {
-            entity.setAnswer1(payload.getAnswer1());
-        }
-        if (payload.getAnswer2() != null && !payload.getAnswer2().isEmpty()) {
-            entity.setAnswer2(payload.getAnswer2());
-        }
-        if (payload.getAnswer3() != null && !payload.getAnswer3().isEmpty()) {
-            entity.setAnswer3(payload.getAnswer3());
-        }
-        if (payload.getAnswer4() != null && !payload.getAnswer4().isEmpty()) {
-            entity.setAnswer4(payload.getAnswer4());
-        }
-
-        if (payload.getAnswer1weight() != null) {
-            entity.setAnswer1weight(payload.getAnswer1weight());
-        }
-        if (payload.getAnswer2weight() != null) {
-            entity.setAnswer2weight(payload.getAnswer2weight());
-        }
-        if (payload.getAnswer3weight() != null) {
-            entity.setAnswer3weight(payload.getAnswer3weight());
-        }
-        if (payload.getAnswer4weight() != null) {
-            entity.setAnswer4weight(payload.getAnswer4weight());
-        }
+    private void deleteOldAnsersFromDb(Question entity) {
+        List<Answer> oldAnswers = entity.getAnswers();
+        answerRepository.deleteAll(oldAnswers);
     }
 
 }
