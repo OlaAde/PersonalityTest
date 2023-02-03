@@ -1,29 +1,59 @@
-import React from 'react';
-import logo from '../assets/logo.svg';
+import React, {useEffect, useState} from 'react';
 import Question from "../components/question";
+import {QuestionType} from "../types/question";
+import Footer from "../components/footer";
 
 const Quiz = () => {
-    return (
-        <div className={"flex min-h-screen flex-col items-center justify-center py-2"}>
-            <main className="flex w-full flex-1 flex-col items-center justify-center px-20 text-center">
-                <h1 className="text-6xl font-bold mb-6">
-                    The Personality Test Calculator
-                </h1>
+    const [questions, setQuestions] = useState<QuestionType[]>([]);
+    const [current, setCurrent] = useState(0);
 
-                <Question id={1} total={5}/>
-            </main>
-            <footer className="flex h-24 w-full items-center justify-center border-t">
-                <a
-                    className="flex items-center justify-center gap-2"
-                    href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Powered by{' '}
-                    <img src={logo} alt="Vercel Logo" width={72} height={16}/>
-                </a>
-            </footer>
-        </div>
+
+    useEffect(() => {
+        fetch('/api/questions')
+            .then(response => response.json())
+            .then(questions => setQuestions(questions))
+            .catch(error => console.error(error))
+            .finally(() => {
+            });
+    }, []);
+
+    function onNext() {
+        if (current === questions.length - 1) {
+            onFinish()
+        } else {
+            setCurrent(current => current + 1);
+        }
+    }
+
+    function onPrevious() {
+        if (current === 0) {
+            return;
+        }
+        setCurrent(current => current - 1);
+    }
+
+    function onFinish() {
+
+    }
+
+    return (
+        <main className="antialiased text-gray-700 bg-gray-100">
+            <div id="app" className="flex w-full h-screen justify-center items-center">
+                <div className="w-full max-w-3xl p-3">
+                    <h1 className="font-bold text-5xl text-center text-indigo-700">
+                        The Personality Test Calculator
+                    </h1>
+                    {questions.length > current &&
+                        <Question current={current} total={questions.length} question={questions[current]}
+                                  onNext={onNext} onPrevious={onPrevious}
+                                  isFirst={current === 0}
+                                  isLast={questions.length - 1 === current}
+                        />}
+                </div>
+            </div>
+
+            <Footer/>
+        </main>
     );
 };
 

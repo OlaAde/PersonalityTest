@@ -1,5 +1,5 @@
-import logo from '../assets/logo.svg';
 import {Link} from "react-router-dom";
+import Footer from "../components/footer";
 
 const Home = () => {
     return (
@@ -29,18 +29,8 @@ const Home = () => {
                     </Link>
                 </div>
             </main>
+            <Footer/>
 
-            <footer className="flex h-24 w-full items-center justify-center border-t">
-                <a
-                    className="flex items-center justify-center gap-2"
-                    href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Powered by{' '}
-                    <img src={logo} alt="Home Logo" width={72} height={16}/>
-                </a>
-            </footer>
         </div>
     )
 }
