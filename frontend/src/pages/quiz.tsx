@@ -2,12 +2,13 @@ import React, {useEffect, useState} from 'react';
 import Question from "../components/question";
 import {AnswerType, QuestionType} from "../types/question";
 import Footer from "../components/footer";
+import {useNavigate} from "react-router-dom";
 
 const Quiz = () => {
     const [questions, setQuestions] = useState<QuestionType[]>([]);
     const [current, setCurrent] = useState(0);
     const [selections, setSelections] = useState<{ [id: number]: AnswerType }>({});
-
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetch('/api/questions')
@@ -37,8 +38,19 @@ const Quiz = () => {
         setSelections(selections => ({...selections, [current]: answer}));
     }
 
-    function onFinish() {
+    function checkIsIntrovert() {
+        const totalScore = Object.values(selections).map(answer => answer.answerWeight)
+            .reduce((acc, cur) => acc + cur, 0);
 
+        const maxScoreForIntrovert = 80;
+
+        return totalScore <= maxScoreForIntrovert;
+    }
+
+    function onFinish() {
+        const isIntrovert = checkIsIntrovert();
+        localStorage.setItem("result", isIntrovert ? "Introvert" : "Extrovert");
+        navigate('/result');
     }
 
     return (
