@@ -38,14 +38,14 @@ public class QuestionService {
 
     public void deleteQuestion(Long id) throws ResourceNotFoundException {
         Question entity = questionRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
-        deleteOldAnsersFromDb(entity);
+        deleteOldAnswersFromDb(entity);
         questionRepository.deleteById(id);
     }
 
     public QuestionDto updateQuestion(Long id, QuestionDto payload) throws ResourceNotFoundException {
         Question entity = questionRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
 
-        deleteOldAnsersFromDb(entity);
+        deleteOldAnswersFromDb(entity);
 
         List<Answer> answers = saveNewAnswersToDb(payload.getAnswers());
         entity.setAnswers(answers);
@@ -59,7 +59,7 @@ public class QuestionService {
         return (List<Answer>) answerRepository.saveAll(answers);
     }
 
-    private void deleteOldAnsersFromDb(Question entity) {
+    private void deleteOldAnswersFromDb(Question entity) {
         List<Answer> oldAnswers = entity.getAnswers();
         answerRepository.deleteAll(oldAnswers);
     }
