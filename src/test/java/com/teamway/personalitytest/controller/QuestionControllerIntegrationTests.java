@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -32,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
 @SpringBootTest
+@ActiveProfiles("test")
 public class QuestionControllerIntegrationTests {
     @Autowired
     private MockMvc mvc;
@@ -128,7 +130,7 @@ public class QuestionControllerIntegrationTests {
 
         given(questionService.updateQuestion(Mockito.anyLong(), Mockito.any(QuestionDto.class))).willReturn(updatedQuestion);
 
-        mvc.perform(patch("/api/questions/1")
+        mvc.perform(put("/api/questions/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new Gson().toJson(payload)))
                 .andExpect(status().isOk())
